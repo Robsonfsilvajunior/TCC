@@ -1,0 +1,26 @@
+{
+  "name": "tcc",
+  "version": "1.0.0",
+  "description": "Projeto tcc sobre site de loja de carro",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Robsonfsilvajunior/TCC.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Robsonfsilvajunior/TCC/issues"
+  },
+  "homepage": "https://github.com/Robsonfsilvajunior/TCC#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.7.0"
+  }
+}
