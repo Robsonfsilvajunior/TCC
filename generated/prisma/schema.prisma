@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Proprietario {
+  CPF_CNPJ   String      @id @map("CPF_CNPJ")
+  RG         String?     @map("RG")
+  NOME       String      @map("NOME")
+  FONE       String      @map("FONE")
+  ENDERECO   String?     @map("ENDERECO")
+  BAIRRO     String?     @map("BAIRRO")
+  CIDADE     String?     @map("CIDADE")
+  ESTADO     String?     @map("ESTADO")
+  automoveis Automovel[]
+
+  @@map("proprietarios")
+}
+
+model Automovel {
+  PLACAS           String             @id @map("PLACAS")
+  MODELO           String             @map("MODELO")
+  MARCA            String             @map("MARCA")
+  ANO              Int                @map("ANO")
+  COMBS            String             @map("COMBS")
+  COR              String             @map("COR")
+  CHASSI           String             @map("CHASSI")
+  DATAENTRADA      DateTime           @map("DATAENTRADA")
+  HORAENTRADA      DateTime           @map("HORAENTRADA")
+  KMENTRADA        Int                @map("KMENTRADA")
+  VALORENTRADA     Decimal            @map("VALORENTRADA") @db.Decimal(10, 2)
+  CPF_CNPJ         String             @map("CPF_CNPJ")
+  proprietario     Proprietario       @relation(fields: [CPF_CNPJ], references: [CPF_CNPJ], onDelete: Cascade)
+  carrosVendidos   CarrosVendidos[]
+  gastosRealizados GastosRealizados[]
+
+  @@map("automoveis")
+}
+
+model Vendedor {
+  CPF      String  @id @map("CPF")
+  RG       String  @map("RG")
+  NOME     String  @map("NOME")
+  ENDERECO String  @map("ENDERECO")
+  BAIRRO   String  @map("BAIRRO")
+  CIDADE   String  @map("CIDADE")
+  ESTADO   String  @map("ESTADO")
+  vendas   Venda[]
+
+  @@map("vendedor")
+}
+
+model Comprador {
+  CPFCOMPR String  @id @map("CPFCOMPR")
+  RG       String  @map("RG")
+  NOME     String  @map("NOME")
+  ENDERECO String  @map("ENDERECO")
+  CIDADE   String  @map("CIDADE")
+  BAIRRO   String  @map("BAIRRO")
+  UF       String  @map("UF")
+  CEP      String  @map("CEP")
+  vendas   Venda[]
+
+  @@map("comprador")
+}
+
+model Venda {
+  NUMVENDA           Int              @id @default(autoincrement()) @map("NUMVENDA")
+  DATAVENDA          DateTime         @map("DATAVENDA")
+  HORAVENDA          DateTime         @map("HORAVENDA")
+  CPFVENDEDOR        String           @map("CPFVENDEDOR")
+  HORASAIDA          DateTime?        @map("HORASAIDA")
+  DATASAIDA          DateTime?        @map("DATASAIDA")
+  comprador_CPFCOMPR String           @map("comprador_CPFCOMPR")
+  vendedor           Vendedor         @relation(fields: [CPFVENDEDOR], references: [CPF], onDelete: Cascade)
+  comprador          Comprador        @relation(fields: [comprador_CPFCOMPR], references: [CPFCOMPR])
+  carrosVendidos     CarrosVendidos[]
+
+  @@map("venda")
+}
+
+model CarrosVendidos {
+  NUMVENDA  Int       @map("NUMVENDA")
+  PLACAS    String    @map("PLACAS")
+  KMVENDA   Int       @map("KMVENDA")
+  TIPOVENDA String    @map("TIPOVENDA")
+  venda     Venda     @relation(fields: [NUMVENDA], references: [NUMVENDA], onDelete: Cascade)
+  automovel Automovel @relation(fields: [PLACAS], references: [PLACAS], onDelete: Cascade)
+
+  @@id([PLACAS, NUMVENDA])
+  @@map("carros_vendidos")
+}
+
+model TiposGastos {
+  COD              Int                @id @default(autoincrement()) @map("COD")
+  DESCRICAO        String             @map("DESCRICAO")
+  gastosRealizados GastosRealizados[]
+
+  @@map("tipos_gastos")
+}
+
+model GastosRealizados {
+  PLACAS           String      @map("PLACAS")
+  CODTIPOGASTO     Int         @map("CODTIPOGASTO")
+  VALORPAGO        Decimal     @map("VALORPAGO") @db.Decimal(10, 2)
+  DATA             DateTime    @map("DATA")
+  tipos_gastos_COD Int         @map("tipos_gastos_COD")
+  automovel        Automovel   @relation(fields: [PLACAS], references: [PLACAS], onDelete: Cascade)
+  tipoGasto        TiposGastos @relation(fields: [tipos_gastos_COD], references: [COD])
+
+  @@id([PLACAS, CODTIPOGASTO, tipos_gastos_COD])
+  @@map("gastos_realizados")
+}

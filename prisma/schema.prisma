@@ -12,7 +12,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:@localhost:3000/tcc"
+  url      = env("DATABASE_URL")
 }
 
 model Proprietario {
